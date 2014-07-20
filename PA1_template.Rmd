@@ -81,3 +81,25 @@ median(countSteps$steps)
 We observe that the mean of the data is same in both the cases. This is expected we are using the mean to fill in the missing values. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
+
+Get the weekdays from the data and merge it with the existing data,adding a new column representing the day of the date.
+```{r}
+weekdays <- weekdays(as.Date(new_act_data$date))
+data_weekdays <- transform(new_act_data, day=weekdays)
+```
+
+Add a new column indicating if it is a weekday or weekend
+```{r}
+data_weekdays$wk <- ifelse(data_weekdays$day %in% c("Saturday", "Sunday"),"weekend", "weekday")
+```
+
+Average the data according to weekday or weekend
+```{r}
+average_week <- ddply(data_weekdays, .(interval, wk), summarise, steps=mean(steps))
+```
+
+Import lattice library and plot the graph.
+```{r}
+library(lattice)
+xyplot(steps ~ interval | wk, data = average_week, layout = c(1, 2), ylab = "Number of Steps", xlab = "Interval", type="l")
+```
