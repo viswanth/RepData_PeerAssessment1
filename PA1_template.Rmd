@@ -13,9 +13,10 @@ This is an R Markdown document for the first Peer Assignment.
 ## Loading and preprocessing the data
 
 First load the activity data into a data frame and have a glimpse into the data with the help of summary functon. 
+PS: Assuming that the activity.csv folder is in the working directory
 
 ```{r}
-act_data <- read.csv("C:/R_working_dir/data/activity.csv")
+act_data <- read.csv("activity.csv")
 summary(act_data)
 ```
 
