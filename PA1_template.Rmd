@@ -10,7 +10,7 @@ This is an R Markdown document for the first Peer Assignment.
 First load the activity data into a data frame and have a glimpse into the data with the help of summary functon. 
 
 ```{r}
-act_data <- read.csv("./data/activity.csv")
+act_data <- read.csv("C:/R_working_dir/data/activity.csv")
 summary(act_data)
 ```
 
@@ -30,4 +30,10 @@ countSteps <- aggregate(steps ~ date, new_act_data, sum)
 Generate the histogram of the number of steps per day.
 ```{r}
 hist(countSteps$steps, main = "Total number of steps per day", xlab="Number of steps")
+```
+
+Calculating the mean and median of the data
+```{r}
+mean(countSteps$steps)
+median(countSteps$steps)
 ```
