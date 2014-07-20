@@ -62,8 +62,6 @@ int_mean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
 new_act_data <-  plyr::ddply(act_data[1:3], .(interval),transform, steps = int_mean(steps),date = date,interval=interval) 
 ```
 
-
-
 Now get the count of steps for each day
 ```{r}
 countSteps <- aggregate(steps ~ date, new_act_data, sum)
@@ -80,5 +78,6 @@ mean(countSteps$steps)
 median(countSteps$steps)
 ```
 
+We observe that the mean of the data is same in both the cases. This is expected we are using the mean to fill in the missing values. 
 
 ## Are there differences in activity patterns between weekdays and weekends?
