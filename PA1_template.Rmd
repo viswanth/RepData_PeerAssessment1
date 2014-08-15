@@ -1,39 +1,40 @@
-# Reproducible Research: Peer Assessment 1
 ---
-title: "Peer Assignment 1"
+title: "PA1_template"
 author: "Viswanth"
-date: "Saturday, July 19, 2014"
-output:
-  html_document:
-    keep_md: yes
+date: "Friday, August 15, 2014"
+output: html_document
 ---
-
-This is an R Markdown document for the first Peer Assignment.
 
 ## Loading and preprocessing the data
 
 First load the activity data into a data frame and have a glimpse into the data with the help of summary functon. 
+
 PS: Assuming that the activity.csv folder is in the working directory
 
-```{r}
+```{r loadData}
 act_data <- read.csv("activity.csv")
 summary(act_data)
 ```
 
+The dataset provided seems to be good and needs no further processing for now. 
+
 ## What is mean total number of steps taken per day?
 
-Get the count of steps for each day
-```{r}
+Get the count of steps for each day. This is done with the help of aggregate function which aggregates the steps factored by dates and applies the function sum to the factored data.
+
+```{r stepCount}
 countSteps_na <- aggregate(steps ~ date, act_data, sum)
 ```
 
-Generate the histogram of the number of steps per day.
-```{r}
+Generate the histogram of the number of steps per day using the hist function. 
+
+```{r histogram}
 hist(countSteps_na$steps, main = "Total number of steps per day", xlab="Number of steps")
 ```
 
-Calculating the mean and median of the data
-```{r}
+Calculating the mean and median of the data. This is simply done using the mean and median functions.
+
+```{r mean_median}
 mean(countSteps_na$steps)
 median(countSteps_na$steps)
 ```
@@ -41,40 +42,42 @@ median(countSteps_na$steps)
 
 ## What is the average daily activity pattern?
 
-Get the total steps per interval across all days using the aggregate function and then plot the graph for average number of steps per interval averaged across all days
+Get the total steps per interval across all days using the aggregate function and then plot the graph for average number of steps per interval averaged across all days. We use the aggregate function with the sum method again to get the number of steps in each interval. We plot the interval against the steps. We divide the steps by 61 as we want the average of steps over 61 days.
 
-```{r}
+```{r averageSteps_Interval}
 steps_per_interval <- aggregate(steps~interval,act_data,sum)
 plot(steps_per_interval$interval,steps_per_interval$steps/61,xlab="Intervals",ylab="Average Steps", type="l")
 ```
 
-Get the interval with the maximum number of steps on average.
-```{r}
+Get the interval with the maximum number of steps on average.We us the which.max function to extract the maximum value
+
+```{r maxStepsPerInterval}
 steps_per_interval$interval[which.max(steps_per_interval$steps)]
 ```
 
 ## Imputing missing values
 
-Since there are missing values, replace those with the mean values for that particular interval range and recreate the dataset.
+Since there are missing values, replace those with the mean values for that particular interval range and recreate the dataset. The plyr library supplies us with the necessary functions to do this task.
 
-```{r}
+
+```{r imputeData}
 library(plyr)
 int_mean <- function(x) replace(x, is.na(x), mean(x, na.rm = TRUE))
 new_act_data <-  plyr::ddply(act_data[1:3], .(interval),transform, steps = int_mean(steps),date = date,interval=interval) 
 ```
 
-Now get the count of steps for each day
-```{r}
+Now get the count of steps for each day with the imputed data
+```{r newCountStepsPerDay}
 countSteps <- aggregate(steps ~ date, new_act_data, sum)
 ```
 
 Generate the histogram of the number of steps per day.
-```{r}
+```{r histogramNew}
 hist(countSteps$steps, main = "Total number of steps per day", xlab="Number of steps")
 ```
 
 Calculating the mean and median of the data
-```{r}
+```{r mean_medianNew}
 mean(countSteps$steps)
 median(countSteps$steps)
 ```
@@ -84,28 +87,30 @@ We observe that the mean of the data is same in both the cases. This is expected
 ## Are there differences in activity patterns between weekdays and weekends?
 
 Get the weekdays from the data and merge it with the existing data,adding a new column representing the day of the date.
-```{r}
+```{r weekdayData}
 weekdays <- weekdays(as.Date(new_act_data$date))
 data_weekdays <- transform(new_act_data, day=weekdays)
 ```
 
 Add a new column indicating if it is a weekday or weekend
-```{r}
+
+```{r weekday_weekend}
 data_weekdays$wk <- ifelse(data_weekdays$day %in% c("Saturday", "Sunday"),"weekend", "weekday")
 ```
 
 Average the data according to weekday or weekend
-```{r}
+```{r averageWeekdayData}
 average_week <- ddply(data_weekdays, .(interval, wk), summarise, steps=mean(steps))
 ```
 
 Import lattice library and plot the graph.
-```{r}
+```{r weekPlot}
 library(lattice)
 xyplot(steps ~ interval | wk, data = average_week, layout = c(1, 2), ylab = "Number of Steps", xlab = "Interval", type="l")
 ```
 
-```{r}
+```{r knitr}
 library(knitr)
 knit2html("PA1_template.Rmd")
 ```
+
